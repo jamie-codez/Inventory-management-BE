@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connection.once("open", () => {
     console.log("INFO: Connected to MongoDB".green);
-    app.listen(port, () => console.log(`INFO: Server running on port ${port}`));
+    app.listen(port, () => console.log(`INFO: Server running on port ${port}`.green));
 });
 
 mongoose.connection.on("error", error => {
