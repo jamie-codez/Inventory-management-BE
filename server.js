@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const userRoutes = require("./routes/userRoutes");
+
 require('dotenv').config();
 require('colors');
 
@@ -17,15 +19,23 @@ mongoose.connect(process.env.MONGODB_URL, {
     socketTimeoutMS: 45000,
 });
 
+/**
+ * Midddlewares
+ * @author Jamie Omondi
+ * @since 19-04-2023
+ */
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: ['text/html', 'text/plain'] }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
+app.use("/users",userRoutes);
 
 mongoose.connection.once("open", () => {
     console.log("INFO: Connected to MongoDB".green);
-    app.listen(port, () => console.log(`INFO: Server running on port ${port}`));
+    app.listen(port, () => console.log(`INFO: Server running on port ${port}`.green));
 });
 
 mongoose.connection.on("error", error => {
