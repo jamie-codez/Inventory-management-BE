@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const errorHandler = require("./middlewares/errorHandler");
+
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 
@@ -33,6 +35,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/api/v1/auth",authRoutes);
 app.use("/api/v1/users",userRoutes);
+
+app.use(errorHandler);
 
 mongoose.connection.once("open", () => {
     console.log("INFO: Connected to MongoDB".green);
