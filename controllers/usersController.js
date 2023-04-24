@@ -1,16 +1,16 @@
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     res.send("Hello createUser");
 }
 
-const getUsers = (req, res) => {
+const getUsers = async (req, res) => {
     res.send("Hello getUsers");
 }
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
     res.send("Hello updateUser");
 }
 
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
     res.send("Hello deleteUser");
 }
 
