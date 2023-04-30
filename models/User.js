@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
     phoneNumber: { type: String, required: [true, "Please add a phone number"] },
     bio: { type: String, required: [true, "Please add a bio"], maxLength: [250, "Bio cannot be more than 250 characters"], default: "Bio" },
     imageUrl: { type: String, required: [true, "Please add an image url"], default: "default" },
-    password: { type: String, required: [true, "Please add a password"], minLength: [8, "Password must be more than 7 characters"], maxLength: [23, "Paasword cannot be more than 23 characters"] }
+    password: { type: String, required: [true, "Please add a password"], minLength: [8, "Password must be more than 7 characters"], maxLength: [250, "Password cannot be more than 50 characters"] }
 }, { timestamps: true });
 
 const model = mongoose.model("User", userSchema);

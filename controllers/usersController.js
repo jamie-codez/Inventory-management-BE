@@ -1,22 +1,23 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+require("colors");
 
 const createUser = asyncHandler(async (req, res) => {
     const { username, firstName, lastName, email, phoneNumber, password } = req.body;
-    if (!username || !firstName || !lastName || !email || phoneNumber || !password) {
+    if (!username || !firstName || !lastName || !email || !phoneNumber || !password) {
         return res.status(400).json({ code: 400, message: "Kindly provide all fields" })
     }
-    if (password.length < 8) {
+    if (password.length < 9) {
         return res.status(400).json({ code: 400, message: "Password too short" });
     }
     const userExists = await User.findOne({ email });
     if (userExists) {
         return res.status(409).json({ code: 409, message: "Email already in use." });
     }
-    const salt = bcrypt.genSalt(10)
-    const encryptedPassword = bcrypt.hash(password, salt);
-    const user = await User({ username, firstName, lastName, email, phoneNumber, encryptedPassword });
+    const salt = await bcrypt.genSalt(10)
+    const encryptedPassword = await bcrypt.hash(password, salt);
+    const user = await User.create({ username, firstName, lastName, email, phoneNumber, password: encryptedPassword });
     if (!user) {
         return res.status(500).json({ code: 500, message: "Error occurred could not create user" });
     }
@@ -33,27 +34,42 @@ const getUsers = async (req, res) => {
     if (!pageSize) {
         return res.status(200).json({ code: 400, message: "pageSize cannot be empty" });
     }
+    const skips = (Number(pageNumber) - 1) * (Number(pageSize));
     const count = await User.find().count();
-    await User.find().then(users => {
+    const projection = {
+        password: false,
+        createdAt: false,
+        updatedAt: false,
+        __v: false
+    }
+    await User.find({}, projection).skip(skips).limit(Number(pageSize)).then(users => {
         res.status(200).json({ code: 200, message: "Successful", payload: users, pagination: { pageNumber: pageNumber, pageSize: pageSize, pages: Number(count) / pageNumber } });
+    }).catch(error => {
+        console.log(`${error.messaage}`.red);
+        res.status(500).json({ code: 500, message: "Error occurred try again" })
     });
 }
 
 const updateUser = async (req, res) => {
     const { id, payload } = req.body
+    if (!id) {
+        return res.status(400).json({ code: 400, message: "id cannot be null" });
+    }
+    if (!payload) {
+        return res.status(400).json({ code: 400, message: "payload cannot be empty" });
+    }
     if (payload.password) {
-        const salt = bcrypt.genSalt(10);
-        const encryptedPassword = bcrypt.hash(payload.password, salt);
+        const salt = await bcrypt.genSalt(10);
+        const encryptedPassword = await bcrypt.hash(payload.password, salt);
         req.body.password = encryptedPassword;
     }
     await User.findByIdAndUpdate({ "_id": id }, { $set: payload })
         .then(result => {
             res.status(200).json({ code: 200, message: "User updated successfully" })
-            console.log(result);
         })
         .catch(error => {
             res.status(500).json({ code: 500, messaage: "Error occurred try again" })
-            console.log(error);
+            console.log(`${error.message}`.red);
         });
 }
 
@@ -69,9 +85,8 @@ const deleteUser = async (req, res) => {
         })
         .catch(error => {
             res.status(500).json({ code: 500, messaage: "Error occurred try again" })
-            console.log(error);
+            console.log(`${error.messaage}`.red);
         });
-    res.send("Hello deleteUser");
 }
 
 module.exports = { createUser, getUsers, updateUser, deleteUser };
