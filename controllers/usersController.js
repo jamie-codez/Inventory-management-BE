@@ -15,9 +15,7 @@ const createUser = asyncHandler(async (req, res) => {
     if (userExists) {
         return res.status(409).json({ code: 409, message: "Email already in use." });
     }
-    const salt = await bcrypt.genSalt(10)
-    const encryptedPassword = await bcrypt.hash(password, salt);
-    const user = await User.create({ username, firstName, lastName, email, phoneNumber, password: encryptedPassword });
+    const user = await User.create({ username, firstName, lastName, email, phoneNumber, password });
     if (!user) {
         return res.status(500).json({ code: 500, message: "Error occurred could not create user" });
     }
@@ -58,11 +56,11 @@ const updateUser = async (req, res) => {
     if (!payload) {
         return res.status(400).json({ code: 400, message: "payload cannot be empty" });
     }
-    if (payload.password) {
-        const salt = await bcrypt.genSalt(10);
-        const encryptedPassword = await bcrypt.hash(payload.password, salt);
-        req.body.password = encryptedPassword;
-    }
+    // if (payload.password) {
+    //     const salt = await bcrypt.genSalt(10);
+    //     const encryptedPassword = await bcrypt.hash(payload.password, salt);
+    //     req.body.password = encryptedPassword;
+    // }
     await User.findByIdAndUpdate({ "_id": id }, { $set: payload })
         .then(result => {
             res.status(200).json({ code: 200, message: "User updated successfully" })
