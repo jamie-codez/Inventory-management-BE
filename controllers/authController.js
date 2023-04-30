@@ -81,7 +81,9 @@ const refreshJwt = async (req, res) => {
     if (decodedJwt.expiresIn <= Date.now()) {
         const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
         res.setHeader("Content-Type", "application/json");
-        res.setHeader("access-token", authToken);
+        res.setHeader("access-token", authToken); //3600*24*7
+        //TODO: Resolve to using httpOnly cookies
+        // res.cookie("token",token,{path:"/",httpOnly:true,expires:new Date(Date.now() + 1000 *86400),sameSite:"none",secure:true})
         return res.status(200).json({ code: 200, message: "Token refreshed succesddfully." })
     }
     res.status(403).setHeader("Content-Type", "application/json").json({ code: 403, message: "Refresh token expired you need to login again" });
