@@ -21,9 +21,9 @@ const login = async (req, res) => {
     }
     const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
     const refreshToken = await jwt.sign({ sub: user._id, expiresIn: "30d", iat: Date.now() }, process.env.JWT_SECRET)
-    res.setHeader("Content-Type","application/json");
-    res.setHeader("access-token",authToken);
-    res.setHeader("refreshToken",refreshToken);
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("access-token", authToken);
+    res.setHeader("refresh-token", refreshToken);
     res.status(200).json({ code: 200, message: "Login successful" });
 };
 
@@ -76,7 +76,15 @@ const sendPasswordResetpage = async (req, res) => {
 };
 
 const refreshJwt = async (req, res) => {
-    res.send("refresh jwt");
+    const refreshToken = req.getHeader("refresh-token");
+    const decodedJwt = await jwt.verify(refreshJwt, process.env.JWT_SECRET)
+    if (decodedJwt.expiresIn <= Date.now()) {
+        const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("access-token", authToken);
+        return res.status(200).json({ code: 200, message: "Token refreshed succesddfully." })
+    }
+    res.status(403).setHeader("Content-Type", "application/json").json({ code: 403, message: "Refresh token expired you need to login again" });
 };
 
 module.exports = { login, resetPassword, requestResetPassword, sendPasswordResetpage, refreshJwt };
