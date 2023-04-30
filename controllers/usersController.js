@@ -56,11 +56,6 @@ const updateUser = async (req, res) => {
     if (!payload) {
         return res.status(400).json({ code: 400, message: "payload cannot be empty" });
     }
-    // if (payload.password) {
-    //     const salt = await bcrypt.genSalt(10);
-    //     const encryptedPassword = await bcrypt.hash(payload.password, salt);
-    //     req.body.password = encryptedPassword;
-    // }
     await User.findByIdAndUpdate({ "_id": id }, { $set: payload })
         .then(result => {
             res.status(200).json({ code: 200, message: "User updated successfully" })
