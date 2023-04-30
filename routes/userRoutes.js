@@ -1,12 +1,13 @@
 const router = require('express').Router();
 const { createUser, getUsers, updateUser, deleteUser } = require("../controllers/usersController");
+const { protect } = require('../middlewares/authMiddleWare');
 
-router.post("/register", createUser);
+router.post("/register", protect, createUser);
 
-router.get("/getUsers", getUsers);
+router.get("/getUsers", protect, getUsers);
 
-router.put("/updateUser", updateUser);
+router.put("/updateUser", protect, updateUser);
 
-router.delete("/deleteUser", deleteUser);
+router.delete("/deleteUser", protect, deleteUser);
 
 module.exports = router;

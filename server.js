@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -29,6 +30,7 @@ mongoose.connect(process.env.MONGODB_URL, {
  */
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: ['text/html', 'text/plain'] }));
 app.use(bodyParser.urlencoded({ extended: false }));
