@@ -24,7 +24,7 @@ const createUser = asyncHandler(async (req, res) => {
     }
 });
 
-const getUsers = async (req, res) => {
+const getUsers = asyncHandler(async (req, res) => {
     const { pageNumber, pageSize } = req.body;
     if (!pageNumber) {
         return res.status(200).setHeader("Content-Type","application/json").json({ code: 400, messaage: "pageNumber cannot be empty" });
@@ -46,9 +46,9 @@ const getUsers = async (req, res) => {
         console.log(`${error.messaage}`.red);
         res.status(500).setHeader("Content-Type","application/json").json({ code: 500, message: "Error occurred try again" })
     });
-}
+});
 
-const updateUser = async (req, res) => {
+const updateUser = asyncHandler(async (req, res) => {
     const { id, payload } = req.body
     if (!id) {
         return res.status(400).setHeader("Content-Type","application/json").setHeader("Content-Type","application/json").json({ code: 400, message: "id cannot be null" });
@@ -64,9 +64,9 @@ const updateUser = async (req, res) => {
             res.status(500).setHeader("Content-Type","application/json").json({ code: 500, messaage: "Error occurred try again" })
             console.log(`${error.message}`.red);
         });
-}
+});
 
-const deleteUser = async (req, res) => {
+const deleteUser = asyncHandler(async (req, res) => {
     const { id } = req.body;
     const user = await User.findOne({ _id: id })
     if (!user) {
@@ -80,6 +80,6 @@ const deleteUser = async (req, res) => {
             res.status(500).setHeader("Content-Type","application/json").json({ code: 500, messaage: "Error occurred try again" })
             console.log(`${error.messaage}`.red);
         });
-}
+});
 
 module.exports = { createUser, getUsers, updateUser, deleteUser };
