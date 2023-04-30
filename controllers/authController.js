@@ -1,12 +1,13 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const ResetCode = require("../models/ResetCode");
 const { randomAlphaNumeric } = require("../utils/utils");
 require("colors");
 
-const login = async (req, res) => {
+const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).setHeader("Content-Type", "application/json").json({ code: 400, message: "Please provide all fields" });
@@ -25,9 +26,9 @@ const login = async (req, res) => {
     res.setHeader("access-token", authToken);
     res.setHeader("refresh-token", refreshToken);
     res.status(200).json({ code: 200, message: "Login successful" });
-};
+});
 
-const resetPassword = async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
     const { password } = req.body;
     const code = req.params["code"];
     if (!password) {
@@ -50,9 +51,9 @@ const resetPassword = async (req, res) => {
             console.log(`${error.message}`.red);
             res.status(500).setHeader("Content-Type", "application/json").json({ code: 500, message: "Error occurred try again" });
         });
-};
+});
 
-const requestResetPassword = async (req, res) => {
+const requestResetPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) {
         return res.status(400).setHeader("Content-Type", "application/json").json({ code: 400, message: "email cannot be empty" });
@@ -69,14 +70,14 @@ const requestResetPassword = async (req, res) => {
     }
     //TODO: send email to user with reset link -> containing the code
     res.status(200).setHeader("Content-Type", "application/json").json({ code: 200, message: "Password reset link has been sent to your email" });
-};
+});
 
-const sendPasswordResetpage = async (req, res) => {
+const sendPasswordResetpage = asyncHandler(async (req, res) => {
     res.status(200).sendFile(path.join(__dirname, "../static/password", "password.html"));
-};
+});
 
-const refreshJwt = async (req, res) => {
-    const refreshToken = req.getHeader("refresh-token");
+const refreshJwt = asyncHandler(async (req, res) => {
+    const refreshToken = req.headers["refresh-token"];
     const decodedJwt = await jwt.verify(refreshJwt, process.env.JWT_SECRET)
     if (decodedJwt.expiresIn <= Date.now()) {
         const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
@@ -87,6 +88,6 @@ const refreshJwt = async (req, res) => {
         return res.status(200).json({ code: 200, message: "Token refreshed succesddfully." })
     }
     res.status(403).setHeader("Content-Type", "application/json").json({ code: 403, message: "Refresh token expired you need to login again" });
-};
+});
 
 module.exports = { login, resetPassword, requestResetPassword, sendPasswordResetpage, refreshJwt };
