@@ -1,4 +1,3 @@
-const express = require("express");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -20,9 +19,12 @@ const login = async (req, res) => {
     if (!passwordMatches) {
         return res.status(403).setHeader("Content-Type", "application/json").json({ code: 403, message: "Invalid credentials" });
     }
-    const authToken = await jwt.sign({ sub: user.email, expiresIn: "7d" }, process.env.JWT_SECRET, { algorithm: "RS256" })
-    const refreshToken = await jwt.sign({ sub: user.email, expiresIn: "7d" }, process.env.JWT_SECRET, { algorithm: "RS256" })
-    res.status(200).setHeader("access-token", authToken).setHeader("refresh-token", refreshJwt).json({ code: 200, message: "Login successful" });
+    const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
+    const refreshToken = await jwt.sign({ sub: user._id, expiresIn: "30d", iat: Date.now() }, process.env.JWT_SECRET)
+    res.setHeader("Content-Type","application/json");
+    res.setHeader("access-token",authToken);
+    res.setHeader("refreshToken",refreshToken);
+    res.status(200).json({ code: 200, message: "Login successful" });
 };
 
 const resetPassword = async (req, res) => {
@@ -41,7 +43,7 @@ const resetPassword = async (req, res) => {
     if (!user) {
         return res.status(404).setHeader("Content-Type", "application/json").json({ code: 404, message: "User does not exist" });
     }
-    await User.findOneAndUpdate({ email }, { $set: { password: password } })
+    await User.findOneAndUpdate({ _id: owner }, { $set: { password: password } })
         .then(response => {
             res.status(200).setHeader("Content-Type", "application/json").json({ code: 200, message: "Password update successfully" });
         }).catch(error => {
