@@ -4,7 +4,7 @@ const { login, resetPassword, requestResetPassword, sendPasswordResetpage, refre
 router.post("/login", login);
 router.post("/resetPassword", resetPassword);
 router.post("/requestResetPassword", requestResetPassword);
-router.get("/sendPasswordResetpage", sendPasswordResetpage);
+router.get("/sendPasswordResetpage/:code", sendPasswordResetpage);
 router.post("/refreshJwt", refreshJwt);
 
 module.exports = router;
