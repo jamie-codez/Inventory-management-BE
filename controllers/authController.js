@@ -1,20 +1,20 @@
-const login = (req, res) => {
+const login = async(req, res) => {
     res.send("login");
 };
 
-const resetPassword = () => {
+const resetPassword = async(req,res) => {
     res.send("Reset password");
 };
 
-const requestResetPassword = (req, res) => {
+const requestResetPassword = async(req, res) => {
     res.send("request reset password");
 };
 
-const sendPasswordResetpage = (Req, res) => {
+const sendPasswordResetpage = async(req, res) => {
     res.send("sendpasswordReset page");
 };
 
-const refreshJwt = (req, res) => {
+const refreshJwt = async(req, res) => {
     res.send("refresh jwt");
 };
 
