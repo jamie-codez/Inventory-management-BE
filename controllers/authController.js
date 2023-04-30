@@ -41,7 +41,7 @@ const resetPassword = async (req, res) => {
     if (!user) {
         return res.status(404).setHeader("Content-Type", "application/json").json({ code: 404, message: "User does not exist" });
     }
-    await User.findOneAndUpdate({ email }, { $set: { password: password } })
+    await User.findOneAndUpdate({ _id:owner }, { $set: { password: password } })
         .then(response => {
             res.status(200).setHeader("Content-Type", "application/json").json({ code: 200, message: "Password update successfully" });
         }).catch(error => {
