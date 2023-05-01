@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
+const { sendMail, randomAlphaNumeric } = require("../utils/utils");
+const { ActivationCode } = require("../models/ActivationCode");
 require("colors");
 
 const createUser = asyncHandler(async (req, res) => {
@@ -19,9 +20,26 @@ const createUser = asyncHandler(async (req, res) => {
     if (!user) {
         return res.status(500).setHeader("Content-Type", "application/json").json({ code: 500, message: "Error occurred could not create user" });
     }
+    const code = randomAlphaNumeric()
+    const activation = await ActivationCode.create({ code: code, owner: user._id });
+    if (!activation) return res.status(500).setHeader("COntent-Type", "application/json").json({ code: 500, messaage: "Error occurred try again" });
+    const link = `http://${req.hostname}:${process.env.PORT}/api/v1/user/activate/${code}`
+    sendMail("Admin <cloud@grandure.com>", email, "Account Activation", "Click the link below to activate your account", `<a href=${link}>Click here to activate account</a>`);
     if (user) {
         return res.status(201).setHeader("Content-Type", "application/json").json({ code: 201, message: "User created succcessfully,check email to verify account." });
     }
+});
+
+const activateAccount = asyncHandler(async (req, res) => {
+    const code = req.params["code"];
+    if (!code) {
+        return res.status(400).setHeader("Content-Type", "application/json").json({ code: 400, message: "Activation code cannot be null" });
+    }
+    const activationCode = ActivationCode.findOne({code});
+    if(!activationCode){
+        return res.status(404).setHeader("Content-Type","application/json").json({code:404,message:"Activtion code already used"});
+    }
+    
 });
 
 const getUserById = asyncHandler(async (req, res) => {
@@ -94,4 +112,4 @@ const deleteUser = asyncHandler(async (req, res) => {
         });
 });
 
-module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser };
+module.exports = { createUser, getUsers, activateAccount, getUserById, updateUser, deleteUser };
