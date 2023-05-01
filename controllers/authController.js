@@ -71,7 +71,7 @@ const resetPassword = asyncHandler(async (req, res) => {
         .then(response => {
             res.status(200).setHeader("Content-Type", "application/json").json({ code: 200, message: "Password update successfully" });
         }).catch(error => {
-            console.log(`${error.message}`.red);
+            console.error(`${error.message}`.red);
             res.status(500).setHeader("Content-Type", "application/json").json({ code: 500, message: "Error occurred try again" });
         });
 });
@@ -101,7 +101,7 @@ const sendPasswordResetpage = asyncHandler(async (req, res) => {
 
 const refreshJwt = asyncHandler(async (req, res) => {
     const refreshToken = req.headers["refresh-token"];
-    const decodedJwt = await jwt.verify(refreshJwt, process.env.JWT_SECRET)
+    const decodedJwt = await jwt.verify(refreshToken, process.env.JWT_SECRET)
     if (decodedJwt.expiresIn <= Date.now()) {
         const authToken = await jwt.sign({ sub: user._id, expiresIn: "7d", iat: Date.now() }, process.env.JWT_SECRET)
         res.setHeader("Content-Type", "application/json");

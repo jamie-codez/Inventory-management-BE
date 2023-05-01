@@ -1,10 +1,12 @@
 const router = require('express').Router();
-const { createUser, getUsers, updateUser, deleteUser } = require("../controllers/usersController");
+const { createUser, getUsers, updateUser, deleteUser, getUserById } = require("../controllers/usersController");
 const { protect } = require('../middlewares/authMiddleWare');
 
 router.post("/register", protect, createUser);
 
 router.get("/getUsers", protect, getUsers);
+
+router.get("/getUserById", protect, getUserById);
 
 router.put("/updateUser", protect, updateUser);
 
