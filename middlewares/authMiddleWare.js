@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 
 const protect = asyncHandler(async (req, res, next) => {
     try {
-        const token = req.headers["access-token"];
+        const token = req.cookies["access-token"];
         if (!token) {
             return res.status(403).setHeader("Content-Type", "application/json").json({ code: 403, message: "Access token not provided" });
         }
